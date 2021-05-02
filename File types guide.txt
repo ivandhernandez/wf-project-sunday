@@ -1,0 +1,56 @@
+File types:
+
+1) MENU- Shows a list of all existing Items in the branch's POS
+
+Important columns:
+-REF_NO -> indicates the Item Number
+-DESCRIPT -> indicates the Item Name
+-PAGE_NUM -> indicates the Item's corresponding Group
+
+
+2) PAGES- Shows a list of all existing Groups (Ex. Breakfast 1, Breakfast 2, Pastries 1, Pastries 2) in the branch's POS
+
+Important columns:
+-PAGE_NUM -> indicates the Group Number
+-PAGE_NAME -> indicates the Group Name
+-PAGE_TYPE -> indicates the Group's corresponding Group Type
+
+
+3) PAGETYPE- Shows a list of all existing Group Types (ex. Food, Beverage, Wine) in the branch's POS
+
+Important columns:
+-PAGE_DESC -> indicates the Group Type Name
+-PAGE_TYPE -> indicates the Group Type Number
+
+
+4) REVCENT- Shows a list of all existing Revenue Centers (ex. Dine In, Take Out, FoodPanda) in the branch's POS
+
+Important columns:
+-RC_NAME -> indicates the Revenue Center Name
+-REV_CENTER -> indicates the Revenue Center Number
+
+
+5) SDET- Shows a list of all transactions, broken down per item, within the month covered by the file (Ex. SDET0321 shows all transactions for March 2021, SDET0421 shows April 2021, etc)
+
+Important columns:
+-BILL_NO -> indicates the Bill Number of the transaction
+-REF_NO -> indicates the Item included in the bill
+-QUANTY -> indicates the amount bought for the corresponding Item
+-PRICE_PAID -> indicates the amount paid by the guest for the corresponding Item within the same row
+-ORD_DATE -> indicates the Date the Item was entered
+
+
+6) SLS- Shows a list of all transactions, broken down per Bill Number, within the month covered by the file (Ex. SLS0321 shows all transactions for March 2021, SLS0421 shows April 2021, etc)
+
+Important columns:
+-BILL_NO -> indicates the Bill Number of the transaction
+-DATE -> indicates the Date that the bill was first made
+-PAY_TYPE -> indicates the Settlement Method used by the bill
+-REV_CENTER -> indicates the Revenue Center used by the bill
+
+
+7) TIPOPAG- Shows a list of all existing Settlement Methods (Ex. Cash, Check, Credit Card) in the branch's POS
+
+Important columns:
+-TPAGO_NO -> indicates the Settlement Method Number
+-TPAGO_NAME -> indicates the Settlement Method Name
