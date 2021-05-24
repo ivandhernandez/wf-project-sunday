@@ -1,8 +1,12 @@
 # Wildflour Data Pipeline Documentation
 ## Introduction
-	The following README serves as documentation for an automated data pipeline that processes multi-branch DBF sales files into a consolidated object storage in DigitalOcean Spaces. The data pipeline uses Apache Airflow Directed Acylic Graphs (DAG’s) to orchestrate the workflow between steps.
+
+The following README serves as documentation for an automated data pipeline that processes multi-branch DBF sales files into a consolidated object storage in DigitalOcean Spaces. The data pipeline uses Apache Airflow Directed Acylic Graphs (DAG’s) to orchestrate the workflow between steps.
+
 ## Prerequisites
-	To implement the pipeline, Apache Airflow must be installed and configured on a laptop to run the weekly jobs. Apache Airflow is a platform that allows users to orchestrate and monitor workflows (Apache Airflow documentation). In addition to this, DigitalOcean Spaces must be configured to separate folders by branch and date. There are several parameters in the code (which have been indicated with a note on the file) that need to be edited once the DigitalOcean Spaces bucket system is implemented. It is up to the user to edit this and the wf_data_dag.py file can be tweaked to indicate the folder set up.
+
+To implement the pipeline, Apache Airflow must be installed and configured on a laptop to run the weekly jobs. Apache Airflow is a platform that allows users to orchestrate and monitor workflows (Apache Airflow documentation). In addition to this, DigitalOcean Spaces must be configured to separate folders by branch and date. There are several parameters in the code (which have been indicated with a note on the file) that need to be edited once the DigitalOcean Spaces bucket system is implemented. It is up to the user to edit this and the wf_data_dag.py file can be tweaked to indicate the folder set up.
+
 ## Implementation
 The data pipeline workflow can be found in the wf_data_dag.py file. The file consists mainly of three steps. The first step grabs the DBF files of each branch from the DigitalOcean Spaces storage and converts these files into CSV files back into another DigitalOcean Spaces bucket. The second step applies transformations into the sales reports needed by the company. The last step transforms these tables into a master table which is conversely connected to a Tableau Dashboard.
 
