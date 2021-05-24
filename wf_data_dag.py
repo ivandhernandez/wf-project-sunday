@@ -317,11 +317,39 @@ with DAG('wf_data_dag',
 
     def _merge_reports(**kwargs):
         ''' Merges reports '''
-        # FIXME
+        # TODO: Finish concatenation of branch files
         # Read all branches from DigitalOcean Space
-        sdet_obj = client.get_object(kwargs['Bucket'], kwargs['Key_SDET'])
-        sdet_dbf = DBF(BytesIO(sdet_obj['Body'].read()))
-        sdet_df = pd.DataFrame(iter(sdet_dbf))
+        try:
+            # Merging for the item sales by group
+            lf_bgc_isg_obj = s3.get_object(Bucket=kwargs['Bucket'], Key=kwargs['Key_LF_BGC_ISG'])
+            lf_bgc_isg_df = pd.read_csv(lf_bgc_isg_obj['Body'])
+            wf_bgc_isg_obj = s3.get_object(Bucket=kwargs['Bucket'], Key=kwargs['Key_WF_BGC_ISG'])
+            wf_bgc_isg_df = pd.read_csv(wf_bgc_isg_obj['Body'])
+            wf_greenhills_isg_obj = s3.get_object(Bucket=kwargs['Bucket'], Key=kwargs['Key_WF_GREENHILLS_ISG'])
+            wf_greenhills_isg_df = pd.read_csv(wf_greenhills_isg_obj['Body'])
+            wf_podium_isg_obj = s3.get_object(Bucket=kwargs['Bucket'], Key=kwargs['Key_WF_PODIUM_ISG'])
+            wf_podium_isg_df = pd.read_csv(wf_podium_isg_obj['Body'])
+            wf_rada_isg_obj = s3.get_object(Bucket=kwargs['Bucket'], Key=kwargs['Key_WF_RADA_ISG'])
+            wf_rada_isg_df = pd.read_csv(wf_rada_isg_obj['Body'])
+            wf_rockwell_isg_obj = s3.get_object(Bucket=kwargs['Bucket'], Key=kwargs['Key_WF_ROCKWELL_ISG'])
+            wf_rockwell_isg_df = pd.read_csv(wf_rockwell_isg_obj['Body'])
+            wf_salcedo_isg_obj = s3.get_object(Bucket=kwargs['Bucket'], Key=kwargs['Key_WF_SALCEDO_ISG'])
+            wf_salcedo_isg_df = pd.read_csv(wf_salcedo_isg_obj['Body'])
+            wf_uptown_isg_obj = s3.get_object(Bucket=kwargs['Bucket'], Key=kwargs['Key_WF_UPTOWN_ISG'])
+            wf_uptown_isg_df = pd.read_csv(wf_uptown_isg_obj['Body'])
+            wfi_bgc_isg_obj = s3.get_object(Bucket=kwargs['Bucket'], Key=kwargs['Key_WFI_BGC_ISG'])
+            wfi_bgc_isg_df = pd.read_csv(wfi_bgc_isg_obj['Body'])
+            # Concat files
+            isg_frames = [lf_bgc_isg_df, wf_bgc_isg_df, wf_greenhills_isg_df, wf_podium_isg_df, wf_rada_isg_df, wf_rockwell_isg_df, wf_salcedo_isg_df, wf_uptown_isg_df, wfi_bgc_isg_df]
+            isg_master_df = pd.concat(isg_frames)
+            # Upload files back to DigitalOcean
+            isg_master_csv_buffer = StringIO()
+            isg_master_df.to_csv(isg_master_csv_buffer)
+            isg_key = kwargs['Target_Key_ISG'] + '/ISG_Master_' + str(datetime.today().strftime('%Y-%m-%d')) + '.csv'      # NOTE: Edit this to fit desired bucket structure
+            client.put_object(kwargs['Bucket'], isg_key, Body=isg_master_csv_buffer.getvalue())
+            return success
+        except:
+            return failure
 
     # Jobs
     # NOTE: Must replace Buckets and Keys with correct Buckets + Keys
@@ -799,21 +827,35 @@ with DAG('wf_data_dag',
         task_id = 'merge_reports',
         python_callable = _merge_reports,
         op_kwargs={'Bucket': 'name_of_bucket',
-                   'Key_': 'name_of_key',
-                   'Key_SLS': 'name_of_key',
-                   'Key_PAGES': 'name_of_key',
-                   'Key_MENU': 'name_of_key',
-                   'Key_PAGETYPE': 'name_of_key',
-                   'Key_REVCENT': 'name_of_key',
-                   'Key_TIPOPAG': 'name_of_key',
-                   'Key_GROUP_LOOKUP': 'name_of_group_lookup_file',
-                   'Key_RC_LOOKUP': 'name_of_rc_lookup_file',
-                   'Target_Key_GROUP_SALES': 'name_of_key',
-                   'Target_Key_RC_SALES': 'name_of_key',
-                   'Target_Key_ITEM_SALES_GROUP': 'name_of_key',
-                   'Target_Key_ITEM_SALES_RC': 'name_of_key',
-                   'Target_Key_SUMIF_RC': 'name_of_key',
-                   'Target_Key_SUMIF_GRP': 'name_of_key',
-                   'Branch': 'WFI BGC'
+                   'Key_LF_BGC_ISG': 'name_of_key',
+                   'Key_WF_BGC_ISG': 'name_of_key',
+                   'Key_WF_GREENHILLS_ISG': 'name_of_key',
+                   'Key_WF_PODIUM_ISG': 'name_of_key',
+                   'Key_WF_RADA_ISG': 'name_of_key',
+                   'Key_WF_ROCKWELL_ISG': 'name_of_key',
+                   'Key_WF_SALCEDO_ISG': 'name_of_key',
+                   'Key_WF_UPTOWN_ISG': 'name_of_key',
+                   'Key_WFI_BGC_ISG': 'name_of_key',
+                   'Target_Key_ISG': 'name_of_key',
                    }
     )
+
+    success = BashOperator(
+        task_id = 'success',
+        bash_command = "echo 'Pipeline success'"
+    )
+
+    failure = BashOperator(
+        task_id = 'failure',
+        bash_command = "echo 'Pipeline failed'"
+    )
+
+    [LF_BGC_DBF_to_Sales_Reports,
+     WF_BGC_DBF_to_Sales_Reports,
+     WF_Greenhills_DBF_to_Sales_Reports, 
+     WF_Podium_DBF_to_Sales_Reports, 
+     WF_Rada_DBF_to_Sales_Reports, 
+     WF_Rockwell_DBF_to_Sales_Reports, 
+     WF_Salcedo_DBF_to_Sales_Reports, 
+     WF_Uptown_DBF_to_Sales_Reports, 
+     WFI_BGC_DBF_to_Sales_Reports] >> merge_reports >> [success, failure]
